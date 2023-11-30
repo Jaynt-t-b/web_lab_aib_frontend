@@ -1,43 +1,71 @@
-// app.js
-document.getElementById('red').addEventListener('input', changeColor);
-document.getElementById('green').addEventListener('input', changeColor);
-document.getElementById('blue').addEventListener('input', changeColor);
-document.getElementById('generate').addEventListener('click', generateColor);
+function updateColor() {
+    var red = document.getElementById("red").value || 0;
+    var green = document.getElementById("green").value || 0;
+    var blue = document.getElementById("blue").value || 0;
 
-var selectedColor = null;
+    red = validateInput(red);
+    green = validateInput(green);
+    blue = validateInput(blue);
 
-function changeColor() {
-    var red = document.getElementById('red').value;
-    var green = document.getElementById('green').value;
-    var blue = document.getElementById('blue').value;
-
-    document.getElementById('colorArea').style.backgroundColor = 'rgb(' + red + ',' + green + ',' + blue + ')';
+    var colorDisplay = document.getElementById("color-display");
+    colorDisplay.style.backgroundColor = "rgb(" + red + "," + green + "," + blue + ")";
 }
 
-function generateColor() {
-    var colorList = document.getElementById('colorList');
-    if (colorList.children.length >= 15) {
-        colorList.removeChild(colorList.firstChild);
+function validateInput(value) {
+    if (isNaN(value)) {
+        return 0;
+    }
+    return Math.max(0, Math.min(value, 255));
+}
+
+function generateBlock() {
+    var colorDisplay = document.getElementById("color-display");
+    var color = window.getComputedStyle(colorDisplay).backgroundColor;
+
+    if (!color || color === "rgba(0, 0, 0, 0)") {
+        alert("Введите значения цветов и нажмите 'Сгенерировать'.");
+        return;
     }
 
-    var colorBlock = document.createElement('div');
-    colorBlock.style.width = '60px';
-    colorBlock.style.height = '60px';
-    colorBlock.style.backgroundColor = document.getElementById('colorArea').style.backgroundColor;
-    colorBlock.addEventListener('click', function() {
-        selectedColor = this.style.backgroundColor;
+    var colorBlocksContainer = document.getElementById("color-blocks-container");
+
+    var colorBlock = document.createElement("div");
+    colorBlock.classList.add("color-block");
+    colorBlock.style.backgroundColor = color;
+
+    colorBlocksContainer.prepend(colorBlock);
+
+    saveColorToLocal(color);
+}
+
+function saveColorToLocal(color) {
+    var savedColors = JSON.parse(localStorage.getItem("savedColors")) || [];
+    savedColors.unshift(color); 
+    if (savedColors.length > 15) {
+        savedColors.pop(); 
+    }
+    localStorage.setItem("savedColors", JSON.stringify(savedColors));
+}
+
+function applySavedColors() {
+    var savedColors = JSON.parse(localStorage.getItem("savedColors")) || [];
+    var colorBlocksContainer = document.getElementById("color-blocks-container");
+
+    savedColors.forEach(function (color) {
+        var colorBlock = document.createElement("div");
+        colorBlock.classList.add("color-block");
+        colorBlock.style.backgroundColor = color;
+
+        colorBlock.addEventListener("click", function () {
+            changeBodyBackgroundColor(color);
+        });
+
+        colorBlocksContainer.appendChild(colorBlock);
     });
-    colorList.appendChild(colorBlock);
 }
 
-document.getElementById('changeableArea').addEventListener('click', function() {
-    if (selectedColor) {
-        this.style.backgroundColor = selectedColor;
-    }
-});
+function changeBodyBackgroundColor(color) {
+    document.body.style.backgroundColor = color;
+}
 
-document.body.addEventListener('click', function(event) {
-    if (event.target.id !== 'colorArea' && event.target.id !== 'colorList' && selectedColor) {
-        event.target.style.backgroundColor = selectedColor;
-    }
-});
+applySavedColors();

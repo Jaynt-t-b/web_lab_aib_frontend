@@ -1,11 +1,19 @@
-document.getElementById('red').addEventListener('input', changeColor);
-document.getElementById('green').addEventListener('input', changeColor);
-document.getElementById('blue').addEventListener('input', changeColor);
+function updateColor() {
+    var red = document.getElementById("red").value || 0;
+    var green = document.getElementById("green").value || 0;
+    var blue = document.getElementById("blue").value || 0;
 
-function changeColor() {
-    var red = document.getElementById('red').value;
-    var green = document.getElementById('green').value;
-    var blue = document.getElementById('blue').value;
+    red = validateInput(red);
+    green = validateInput(green);
+    blue = validateInput(blue);
 
-    document.getElementById('colorArea').style.backgroundColor = 'rgb(' + red + ',' + green + ',' + blue + ')';
+    var colorDisplay = document.getElementById("color-display");
+    colorDisplay.style.backgroundColor = "rgb(" + red + "," + green + "," + blue + ")";
+}
+
+function validateInput(value) {
+    if (isNaN(value)) {
+        return 0;
+    }
+    return Math.max(0, Math.min(value, 255));
 }
