@@ -1,10 +1,20 @@
-def count_paths(N, M):
-    dp = [[0]*(M+2) for _ in range(N+2)]
-    dp[2][1] = 1
-    for i in range(2, N+2):
-        for j in range(1, M+2):
-            dp[i][j] += dp[i-1][j-2] + dp[i-2][j-1]
-    return dp[N+1][M+1]
+inputfile = open('input.txt')
+words = inputfile.read()
+n, m = map(int, words.split())
+a = []
+for i in range(n):
+    a.append(list([-1 for j in range(m)]))
+a[0][0] = 1
 
-N, M = map(int, input().split())
-print(count_paths(N, M))
+
+def sol(i, j):
+    if i >= 0 and j >= 0 and i < n and j < m:
+        if a[i][j] == -1:
+            a[i][j] = sol(i-2, j-1)+sol(i-1, j-2)
+    else:
+        return 0
+    return a[i][j]
+
+
+output_file = open('output.txt', 'w')
+output_file.write(str(sol(n-1, m-1)))
